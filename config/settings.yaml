@@ -147,7 +147,7 @@ captions:
     prefer_perpetual_on_selected_slots: true
     slots_per_day: 96
     daily_post_options:
-    - 67
+    - 70
     values:
     - 20
     - 21
@@ -253,3 +253,4 @@ social:
   instagram_enabled: false
   threads_enabled: false
   pending_retry_limit: 1
+

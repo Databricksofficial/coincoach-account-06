@@ -27,6 +27,11 @@ on:
         required: true
         default: false
         type: boolean
+      telegram:
+        description: Publish to Telegram
+        required: true
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -70,6 +75,7 @@ jobs:
       FACEBOOK_PUBLISH_ENABLED: ${{ inputs.facebook }}
       INSTAGRAM_PUBLISH_ENABLED: ${{ inputs.instagram }}
       THREADS_PUBLISH_ENABLED: ${{ inputs.threads }}
+      TELEGRAM_PUBLISH_ENABLED: ${{ inputs.telegram }}
 
       DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
       FACEBOOK_PAGE_ID: ${{ secrets.FACEBOOK_PAGE_ID }}
@@ -78,6 +84,8 @@ jobs:
       INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
       THREADS_USER_ID: ${{ secrets.THREADS_USER_ID }}
       THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
       CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
       CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
       CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
@@ -97,7 +105,8 @@ jobs:
           if [ "${{ inputs.discord }}" != "true" ] && \
              [ "${{ inputs.facebook }}" != "true" ] && \
              [ "${{ inputs.instagram }}" != "true" ] && \
-             [ "${{ inputs.threads }}" != "true" ]; then
+             [ "${{ inputs.threads }}" != "true" ] && \
+             [ "${{ inputs.telegram }}" != "true" ]; then
             echo "Select at least one social destination"
             exit 1
           fi

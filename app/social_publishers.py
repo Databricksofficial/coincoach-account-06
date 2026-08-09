@@ -28,6 +28,7 @@ class SocialPlatformConfig:
     facebook_enabled: bool
     instagram_enabled: bool
     threads_enabled: bool
+    telegram_enabled: bool
     request_timeout_seconds: float
     pending_retry_limit: int
     state_path: Path
@@ -43,6 +44,8 @@ class SocialPlatformConfig:
             enabled.append("instagram")
         if self.threads_enabled:
             enabled.append("threads")
+        if self.telegram_enabled:
+            enabled.append("telegram")
         return tuple(enabled)
 
 
@@ -111,6 +114,9 @@ def load_social_config(root: Path, account_id: str) -> SocialPlatformConfig:
         "THREADS_USER_ID", "THREADS_ACCESS_TOKEN",
         "CLOUDINARY_CLOUD_NAME", "CLOUDINARY_API_KEY", "CLOUDINARY_API_SECRET",
     )
+    telegram_enabled = _truthy("TELEGRAM_PUBLISH_ENABLED") and _has_credentials(
+        "TELEGRAM_BOT_TOKEN", "TELEGRAM_CHAT_ID"
+    )
 
     return SocialPlatformConfig(
         account_id=account_id,
@@ -120,6 +126,7 @@ def load_social_config(root: Path, account_id: str) -> SocialPlatformConfig:
         facebook_enabled=facebook_enabled,
         instagram_enabled=instagram_enabled,
         threads_enabled=threads_enabled,
+        telegram_enabled=telegram_enabled,
         request_timeout_seconds=_safe_float(
             "SOCIAL_REQUEST_TIMEOUT_SECONDS", 45.0, 5.0, 180.0
         ),
@@ -473,6 +480,8 @@ class SocialSyndicator:
             return self._publish_instagram(delivery["caption"], image_url)
         if platform == "threads":
             return self._publish_threads(delivery["caption"], image_url)
+        if platform == "telegram":
+            return self._publish_telegram(delivery["caption"], retained)
         raise SocialPublishError(f"Unsupported social platform: {platform}")
 
     def _publish_discord(self, caption: str, image_path: Path) -> str:
@@ -494,6 +503,58 @@ class SocialSyndicator:
         self._raise_for_status(response, "Discord webhook", secret_url=webhook_url)
         body = response.json() if response.content else {}
         return str(body.get("id", "published"))
+
+    def _publish_telegram(self, caption: str, image_path: Path) -> str:
+        bot_token = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
+        chat_id = os.getenv("TELEGRAM_CHAT_ID", "").strip()
+
+        if not bot_token or not chat_id:
+            raise SocialPublishError(
+                "Missing TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID"
+            )
+
+        url = "".join(
+            map(
+                chr,
+                [
+                    104,116,116,112,115,58,47,47,
+                    97,112,105,46,116,101,108,101,103,114,97,109,46,111,114,103
+                ],
+            )
+        )
+        endpoint = f"{url}/bot{bot_token}/sendPhoto"
+
+        payload = {
+            "chat_id": chat_id,
+            "caption": caption[:1024],
+        }
+
+        with image_path.open("rb") as handle:
+            response = self.client.post(
+                endpoint,
+                data=payload,
+                files={
+                    "photo": (
+                        image_path.name,
+                        handle,
+                        "image/png",
+                    )
+                },
+            )
+
+        self._raise_for_status(response, "Telegram sendPhoto")
+
+        body = response.json()
+        result = body.get("result") or {}
+        message_id = result.get("message_id")
+
+        if message_id is None:
+            raise SocialPublishError(
+                "Telegram response did not include message_id"
+            )
+
+        return str(message_id)
+
 
     def _meta_endpoint(self, object_path: str) -> str:
         base = os.getenv("META_GRAPH_BASE_URL", "https://graph.facebook.com").rstrip("/")

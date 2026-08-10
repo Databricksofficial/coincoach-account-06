@@ -290,7 +290,7 @@ jobs:
 
       SOCIAL_STATE_PATH: data/state/${{ matrix.account_id }}/social_delivery_state.json
 
-      SOCIAL_PENDING_RETRY_LIMIT: "1"
+      SOCIAL_PENDING_RETRY_LIMIT: "0"
 
       SOCIAL_REQUEST_TIMEOUT_SECONDS: "45"
 

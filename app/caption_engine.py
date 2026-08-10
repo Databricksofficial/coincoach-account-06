@@ -265,7 +265,7 @@ def _inject_leverage_phrase(opening: str, signal: Signal, leverage: int, seed: b
 
     # Keep leverage inside the same natural opening line instead of creating
     # a separate leverage sentence or field.
-    return f"{opening} — {clause}"
+    return f"{opening}, {clause}"
 
 
 def leverage_slot_active(

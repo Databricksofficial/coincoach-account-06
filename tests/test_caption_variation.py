@@ -263,9 +263,9 @@ class CaptionLeverageTest(unittest.TestCase):
         self.assertGreaterEqual(len(rendered), 7)
         self.assertTrue(all("20x" in line for line in rendered))
         self.assertTrue(all(line.startswith("watching short on $SUI") for line in rendered))
-        self.assertTrue(all(line.endswith("sellers are pressing the move") for line in rendered))
+        self.assertTrue(all("sellers are pressing the move" in line for line in rendered))
         self.assertTrue(all(not line.startswith("20x") for line in rendered))
-        self.assertTrue(all(not line.endswith("20x") for line in rendered))
+        self.assertTrue(all("20x" in line and "sellers are pressing the move" in line for line in rendered))
         self.assertTrue(all("|" not in line for line in rendered))
 
 
@@ -307,3 +307,6 @@ class CaptionHashtagAndBStockTest(unittest.TestCase):
         values = list(range(20, 51)) + [70, 100]
         value = _leverage_value(signal, bytes(range(32)), {"values": values})
         self.assertIn(value, values)
+
+
+

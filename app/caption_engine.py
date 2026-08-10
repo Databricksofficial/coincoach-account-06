@@ -250,39 +250,22 @@ def _leverage_value(signal: Signal, seed: bytes, leverage_cfg: dict) -> int:
 
 
 def _inject_leverage_phrase(opening: str, signal: Signal, leverage: int, seed: bytes) -> str:
-    """Blend leverage naturally inside the opening sentence.
-
-    Leverage is never emitted as a standalone line, sentence prefix, or sentence
-    ending. It sits beside the cashtag as a human-sounding aside while the original
-    market observation remains the main point of the line.
-    """
-
-    cashtag = f"${signal.base_asset}"
+    """Blend leverage naturally into the existing market observation."""
     clauses = [
-        f"with leverage near {leverage}x",
-        f"with the setup mapped around {leverage}x",
-        f"keeping leverage around {leverage}x",
-        f"with roughly {leverage}x on the setup",
-        f"with a {leverage}x leverage plan",
-        f"while I keep leverage near {leverage}x",
-        f"with leverage sitting around {leverage}x",
-        f"with {leverage}x as the working leverage",
+        f"keeping this one around {leverage}x",
+        f"keeping this setup around {leverage}x",
+        f"with {leverage}x in play here",
+        f"so {leverage}x feels reasonable here",
+        f"keeping roughly {leverage}x in play",
+        f"with this one around {leverage}x",
+        f"so I’m working with about {leverage}x",
+        f"keeping the setup around {leverage}x",
     ]
     clause = clauses[seed[24 % len(seed)] % len(clauses)]
 
-    position = opening.find(cashtag)
-    if position >= 0:
-        end = position + len(cashtag)
-        before = opening[:end]
-        after = opening[end:]
-        if after.startswith(","):
-            return f"{before}, {clause}{after}"
-        return f"{before}, {clause},{after}"
-
-    if "," in opening:
-        first, rest = opening.split(",", 1)
-        return f"{first}, {clause}, {rest.lstrip()}"
-    return f"{opening} while {clause} remains in view"
+    # Keep leverage inside the same natural opening line instead of creating
+    # a separate leverage sentence or field.
+    return f"{opening} — {clause}"
 
 
 def leverage_slot_active(
@@ -319,17 +302,11 @@ def _maybe_add_leverage(
     leverage_cfg = caption_cfg.get("leverage", {})
     if not leverage_slot_active(caption_cfg, now, account_id):
         return opening
-    market_tags = {str(tag).lower() for tag in signal.facts.get("market_tags", [])}
-    is_bstock_or_tradfi = "tradfi" in market_tags or "bstock" in market_tags
 
-    # bStock / TradFi uses the fixed 5x rule and does not require
-    # crypto perpetual eligibility.
-    if not is_bstock_or_tradfi:
-        if bool(leverage_cfg.get("require_perpetual_eligible", True)) and not bool(
-            signal.facts.get("perpetual_eligible", False)
-        ):
-            return opening
-
+    # bStock / TradFi always uses the fixed 5x rule.
+    # Normal crypto can receive leverage regardless of whether the scanned
+    # market is currently marked perpetual-eligible. This allows the
+    # configured daily leverage slots to work for spot-scanned crypto too.
     leverage = _leverage_value(signal, seed, leverage_cfg)
     return _inject_leverage_phrase(opening, signal, leverage, seed)
 

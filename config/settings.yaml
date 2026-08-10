@@ -180,6 +180,8 @@ captions:
     - 48
     - 49
     - 50
+    - 70
+    - 100
 
 capture:
   enabled: false

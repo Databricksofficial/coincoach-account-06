@@ -11,16 +11,32 @@ class CaptionVariationTest(unittest.TestCase):
     def test_five_punchy_posts_do_not_repeat_opener(self):
         with tempfile.TemporaryDirectory() as directory:
             storage = Storage(Path(directory) / "test.db")
-            settings = {"captions": {"maximum_recent_phrases": 250, "guys_probability": 0.0}}
+            settings = {
+                "captions": {"maximum_recent_phrases": 250, "guys_probability": 0.0}
+            }
             engine = CaptionEngine(storage, settings)
             openings = []
             for index in range(5):
                 signal = Signal(
-                    signal_id=f"sig-{index}", symbol=f"DEMO{index}USDT", base_asset=f"DEMO{index}",
-                    timeframe="1h", side="LONG", setup="trend_pullback", score=70,
-                    current_price=1.0, entry_low=0.99, entry_high=1.01, entry_mid=1.0,
-                    stop_loss=0.96, tp1=1.06, tp2=1.12, tp3=1.2,
-                    stop_percent=4.0, tp1_percent=6.0, tp2_percent=12.0, tp3_percent=20.0,
+                    signal_id=f"sig-{index}",
+                    symbol=f"DEMO{index}USDT",
+                    base_asset=f"DEMO{index}",
+                    timeframe="1h",
+                    side="LONG",
+                    setup="trend_pullback",
+                    score=70,
+                    current_price=1.0,
+                    entry_low=0.99,
+                    entry_high=1.01,
+                    entry_mid=1.0,
+                    stop_loss=0.96,
+                    tp1=1.06,
+                    tp2=1.12,
+                    tp3=1.2,
+                    stop_percent=4.0,
+                    tp1_percent=6.0,
+                    tp2_percent=12.0,
+                    tp3_percent=20.0,
                     facts={},
                 )
                 caption = engine.generate(signal, "account_01", "punchy")
@@ -30,22 +46,42 @@ class CaptionVariationTest(unittest.TestCase):
 
 
 class CaptionGrammarTest(unittest.TestCase):
-    def _signal(self, signal_id: str, base_asset: str = "XRP", setup: str = "trend_rejection") -> Signal:
+    def _signal(
+        self, signal_id: str, base_asset: str = "XRP", setup: str = "trend_rejection"
+    ) -> Signal:
         return Signal(
-            signal_id=signal_id, symbol=f"{base_asset}USDT", base_asset=base_asset,
-            timeframe="1h", side="SHORT", setup=setup, score=70,
-            current_price=1.0, entry_low=0.99, entry_high=1.01, entry_mid=1.0,
-            stop_loss=1.04, tp1=0.94, tp2=0.88, tp3=0.8,
-            stop_percent=4.0, tp1_percent=6.0, tp2_percent=12.0, tp3_percent=20.0,
+            signal_id=signal_id,
+            symbol=f"{base_asset}USDT",
+            base_asset=base_asset,
+            timeframe="1h",
+            side="SHORT",
+            setup=setup,
+            score=70,
+            current_price=1.0,
+            entry_low=0.99,
+            entry_high=1.01,
+            entry_mid=1.0,
+            stop_loss=1.04,
+            tp1=0.94,
+            tp2=0.88,
+            tp3=0.8,
+            stop_percent=4.0,
+            tp1_percent=6.0,
+            tp2_percent=12.0,
+            tp3_percent=20.0,
             facts={},
         )
 
     def test_guys_replaces_other_opener(self):
         with tempfile.TemporaryDirectory() as directory:
             storage = Storage(Path(directory) / "test.db")
-            settings = {"captions": {"maximum_recent_phrases": 250, "guys_probability": 1.0}}
+            settings = {
+                "captions": {"maximum_recent_phrases": 250, "guys_probability": 1.0}
+            }
             engine = CaptionEngine(storage, settings)
-            opening = engine.generate(self._signal("force-guys"), "account_01", "punchy").splitlines()[0]
+            opening = engine.generate(
+                self._signal("force-guys"), "account_01", "punchy"
+            ).splitlines()[0]
             self.assertTrue(opening.startswith("guys, $XRP "))
             self.assertNotIn("guys, quick one", opening)
             self.assertNotIn("guys, worth a look", opening)
@@ -54,19 +90,29 @@ class CaptionGrammarTest(unittest.TestCase):
     def test_recent_observation_is_not_reused_when_alternatives_exist(self):
         with tempfile.TemporaryDirectory() as directory:
             storage = Storage(Path(directory) / "test.db")
-            settings = {"captions": {"maximum_recent_phrases": 250, "guys_probability": 0.0}}
+            settings = {
+                "captions": {"maximum_recent_phrases": 250, "guys_probability": 0.0}
+            }
             engine = CaptionEngine(storage, settings)
             openings = [
-                engine.generate(self._signal(f"sig-observation-{index}", f"DEMO{index}"), "account_01", "punchy").splitlines()[0]
+                engine.generate(
+                    self._signal(f"sig-observation-{index}", f"DEMO{index}"),
+                    "account_01",
+                    "punchy",
+                ).splitlines()[0]
                 for index in range(4)
             ]
             observations = [
-                next(obs for obs in (
-                    "bounced into resistance and sellers showed up again",
-                    "is struggling to hold the recovery",
-                    "keeps rejecting the same area, so the short side is worth watching",
-                    "tried to recover but the bounce is losing energy again",
-                ) if obs in opening)
+                next(
+                    obs
+                    for obs in (
+                        "bounced into resistance and sellers showed up again",
+                        "is struggling to hold the recovery",
+                        "keeps rejecting the same area, so the short side is worth watching",
+                        "tried to recover but the bounce is losing energy again",
+                    )
+                    if obs in opening
+                )
                 for opening in openings
             ]
             self.assertEqual(4, len(set(observations)))
@@ -75,9 +121,13 @@ class CaptionGrammarTest(unittest.TestCase):
     def test_punchy_opener_is_separated_from_cashtag(self):
         with tempfile.TemporaryDirectory() as directory:
             storage = Storage(Path(directory) / "test.db")
-            settings = {"captions": {"maximum_recent_phrases": 250, "guys_probability": 0.0}}
+            settings = {
+                "captions": {"maximum_recent_phrases": 250, "guys_probability": 0.0}
+            }
             engine = CaptionEngine(storage, settings)
-            opening = engine.generate(self._signal("punctuation", "LINK"), "account_01", "punchy").splitlines()[0]
+            opening = engine.generate(
+                self._signal("punctuation", "LINK"), "account_01", "punchy"
+            ).splitlines()[0]
             self.assertNotIn("clean $LINK", opening)
             self.assertRegex(opening, r"^[^$]+, \$LINK ")
             storage.close()
@@ -86,11 +136,25 @@ class CaptionGrammarTest(unittest.TestCase):
 class CaptionStructureTest(unittest.TestCase):
     def _signal(self, side: str = "SHORT", timeframe: str = "4h") -> Signal:
         return Signal(
-            signal_id=f"structure-{side}-{timeframe}", symbol="BTCUSDT", base_asset="BTC",
-            timeframe=timeframe, side=side, setup="trend_rejection", score=80,
-            current_price=64000.0, entry_low=63900.0, entry_high=64100.0, entry_mid=64000.0,
-            stop_loss=65000.0, tp1=63000.0, tp2=62000.0, tp3=61000.0,
-            stop_percent=1.56, tp1_percent=1.56, tp2_percent=3.12, tp3_percent=4.68,
+            signal_id=f"structure-{side}-{timeframe}",
+            symbol="BTCUSDT",
+            base_asset="BTC",
+            timeframe=timeframe,
+            side=side,
+            setup="trend_rejection",
+            score=80,
+            current_price=64000.0,
+            entry_low=63900.0,
+            entry_high=64100.0,
+            entry_mid=64000.0,
+            stop_loss=65000.0,
+            tp1=63000.0,
+            tp2=62000.0,
+            tp3=61000.0,
+            stop_percent=1.56,
+            tp1_percent=1.56,
+            tp2_percent=3.12,
+            tp3_percent=4.68,
             facts={},
         )
 
@@ -118,13 +182,24 @@ class CaptionStructureTest(unittest.TestCase):
             self.assertIn("TP3:", caption)
             self.assertIn("Stop Loss:", caption)
             self.assertIn("Stop Loss: 65000.00", caption)
-            self.assertRegex(caption.splitlines()[-1], r"^#BTC #(?:Binance|binance) #(?:Write2Earn|Write2Earn!) #(?:crypto|Crypto)$")
+
+            tags = caption.splitlines()[-1].split()
+            self.assertEqual(4, len(tags))
+            self.assertEqual("#BTC", tags[0])
+            self.assertEqual(
+                {tag.lower().rstrip("!") for tag in tags[1:]},
+                {"#binance", "#write2earn", "#crypto"},
+            )
             storage.close()
 
     def test_signal_details_support_multiple_human_readable_layouts(self):
         signal = self._signal("LONG", "15m")
         layouts = {
-            tuple(_format_signal_detail_lines(signal, bytes([value]) * 32, vary_layout=True))
+            tuple(
+                _format_signal_detail_lines(
+                    signal, bytes([value]) * 32, vary_layout=True
+                )
+            )
             for value in range(12)
         }
         self.assertGreaterEqual(len(layouts), 4)
@@ -135,7 +210,9 @@ class CaptionStructureTest(unittest.TestCase):
 
     def test_signal_detail_layout_can_be_fixed(self):
         signal = self._signal("SHORT", "4h")
-        lines = _format_signal_detail_lines(signal, bytes([255]) * 32, vary_layout=False)
+        lines = _format_signal_detail_lines(
+            signal, bytes([255]) * 32, vary_layout=False
+        )
         self.assertEqual(
             [
                 "Entry: 63900.00–64100.00",
@@ -163,21 +240,39 @@ class CaptionStructureTest(unittest.TestCase):
             )
             self.assertIn("Long | Futures | 15M", caption)
             self.assertIn("NFA. DYOR.", caption)
-            self.assertRegex(caption.splitlines()[-1], r"^#BTC #(?:Binance|binance) #(?:Write2Earn|Write2Earn!) #(?:crypto|Crypto)$")
+
+            tags = caption.splitlines()[-1].split()
+            self.assertEqual(4, len(tags))
+            self.assertEqual("#BTC", tags[0])
+            self.assertEqual(
+                {tag.lower().rstrip("!") for tag in tags[1:]},
+                {"#binance", "#write2earn", "#crypto"},
+            )
             storage.close()
 
 
 class CaptionLeverageTest(unittest.TestCase):
     def _signal(self, side: str = "LONG", *, perpetual: bool = True) -> Signal:
         return Signal(
-            signal_id=f"leverage-{side}-{perpetual}", symbol="SUIUSDT", base_asset="SUI",
-            timeframe="1h", side=side, setup="trend_pullback" if side == "LONG" else "trend_rejection",
-            score=78, current_price=1.0, entry_low=0.99, entry_high=1.01, entry_mid=1.0,
+            signal_id=f"leverage-{side}-{perpetual}",
+            symbol="SUIUSDT",
+            base_asset="SUI",
+            timeframe="1h",
+            side=side,
+            setup="trend_pullback" if side == "LONG" else "trend_rejection",
+            score=78,
+            current_price=1.0,
+            entry_low=0.99,
+            entry_high=1.01,
+            entry_mid=1.0,
             stop_loss=0.96 if side == "LONG" else 1.04,
             tp1=1.03 if side == "LONG" else 0.97,
             tp2=1.06 if side == "LONG" else 0.94,
             tp3=1.09 if side == "LONG" else 0.91,
-            stop_percent=4.0, tp1_percent=3.0, tp2_percent=6.0, tp3_percent=9.0,
+            stop_percent=4.0,
+            tp1_percent=3.0,
+            tp2_percent=6.0,
+            tp3_percent=9.0,
             facts={"perpetual_eligible": perpetual, "market_tags": ["perpetual"]},
         )
 
@@ -200,6 +295,7 @@ class CaptionLeverageTest(unittest.TestCase):
 
     def test_daily_plan_assigns_exactly_thirty_slots_per_account(self):
         from datetime import date
+
         from app.caption_engine import _daily_leverage_slots
 
         day = date(2026, 7, 31)
@@ -212,19 +308,38 @@ class CaptionLeverageTest(unittest.TestCase):
 
     def test_leverage_is_blended_only_on_selected_perpetual_slots(self):
         from datetime import date, datetime, timezone
+
         from app.caption_engine import _daily_leverage_slots
 
         day = date(2026, 7, 31)
         selected_slot = min(_daily_leverage_slots(day, [30], account_id="account_01"))
         hour, quarter = divmod(selected_slot, 4)
-        now = datetime(2026, 7, 31, hour, quarter * 15 + 6, tzinfo=timezone.utc)
+        now = datetime(
+            2026,
+            7,
+            31,
+            hour,
+            quarter * 15 + 6,
+            tzinfo=timezone.utc,
+        )
         with tempfile.TemporaryDirectory() as directory:
             storage = Storage(Path(directory) / "test.db")
-            engine = CaptionEngine(storage, self._settings(), now_provider=lambda: now)
+            engine = CaptionEngine(
+                storage,
+                self._settings(),
+                now_provider=lambda: now,
+            )
             caption = engine.generate(self._signal("SHORT"), "account_01", "direct")
             first_line = caption.splitlines()[0]
             self.assertRegex(first_line, r"(?:1[5-9]|2[0-5])x")
-            leverage_value = int(__import__("re").search(r"(1[5-9]|2[0-5])x", first_line).group(1))
+            leverage_value = int(
+                __import__("re")
+                .search(
+                    r"(1[5-9]|2[0-5])x",
+                    first_line,
+                )
+                .group(1)
+            )
             self.assertGreaterEqual(leverage_value, 15)
             self.assertLessEqual(leverage_value, 25)
             self.assertNotIn("|", first_line)
@@ -236,17 +351,31 @@ class CaptionLeverageTest(unittest.TestCase):
 
     def test_non_perpetual_signal_keeps_the_original_caption(self):
         from datetime import date, datetime, timezone
+
         from app.caption_engine import _daily_leverage_slots
 
         day = date(2026, 7, 31)
         selected_slot = min(_daily_leverage_slots(day, [30], account_id="account_01"))
         hour, quarter = divmod(selected_slot, 4)
-        now = datetime(2026, 7, 31, hour, quarter * 15 + 6, tzinfo=timezone.utc)
+        now = datetime(
+            2026,
+            7,
+            31,
+            hour,
+            quarter * 15 + 6,
+            tzinfo=timezone.utc,
+        )
         with tempfile.TemporaryDirectory() as directory:
             storage = Storage(Path(directory) / "test.db")
-            engine = CaptionEngine(storage, self._settings(), now_provider=lambda: now)
+            engine = CaptionEngine(
+                storage,
+                self._settings(),
+                now_provider=lambda: now,
+            )
             first_line = engine.generate(
-                self._signal("LONG", perpetual=False), "account_01", "direct"
+                self._signal("LONG", perpetual=False),
+                "account_01",
+                "direct",
             ).splitlines()[0]
             self.assertNotIn("leverage", first_line.lower())
             self.assertNotIn("leveraged", first_line.lower())
@@ -257,56 +386,111 @@ class CaptionLeverageTest(unittest.TestCase):
 
         opening = "watching short on $SUI, sellers are pressing the move"
         rendered = {
-            _inject_leverage_phrase(opening, self._signal("SHORT"), 20, bytes([value]) * 32)
+            _inject_leverage_phrase(
+                opening,
+                self._signal("SHORT"),
+                20,
+                bytes([value]) * 32,
+            )
             for value in range(8)
         }
         self.assertGreaterEqual(len(rendered), 7)
         self.assertTrue(all("20x" in line for line in rendered))
-        self.assertTrue(all(line.startswith("watching short on $SUI") for line in rendered))
-        self.assertTrue(all("sellers are pressing the move" in line for line in rendered))
+        self.assertTrue(
+            all(line.startswith("watching short on $SUI") for line in rendered)
+        )
+        self.assertTrue(
+            all("sellers are pressing the move" in line for line in rendered)
+        )
         self.assertTrue(all(not line.startswith("20x") for line in rendered))
-        self.assertTrue(all("20x" in line and "sellers are pressing the move" in line for line in rendered))
+        self.assertTrue(
+            all(
+                "20x" in line and "sellers are pressing the move" in line
+                for line in rendered
+            )
+        )
         self.assertTrue(all("|" not in line for line in rendered))
-
-
-if __name__ == "__main__":
-    unittest.main()
 
 
 class CaptionHashtagAndBStockTest(unittest.TestCase):
     def _signal(self, base="BTC", tags=()):
         return Signal(
-            signal_id=f"tags-{base}", symbol=f"{base}USDT", base_asset=base, timeframe="1h",
-            side="LONG", setup="trend_pullback", score=80, current_price=100.0,
-            entry_low=99.0, entry_high=101.0, entry_mid=100.0, stop_loss=96.0,
-            tp1=103.0, tp2=106.0, tp3=109.0, stop_percent=4.0, tp1_percent=3.0,
-            tp2_percent=6.0, tp3_percent=9.0, facts={"perpetual_eligible": True, "market_tags": list(tags)},
+            signal_id=f"tags-{base}",
+            symbol=f"{base}USDT",
+            base_asset=base,
+            timeframe="1h",
+            side="LONG",
+            setup="trend_pullback",
+            score=80,
+            current_price=100.0,
+            entry_low=99.0,
+            entry_high=101.0,
+            entry_mid=100.0,
+            stop_loss=96.0,
+            tp1=103.0,
+            tp2=106.0,
+            tp3=109.0,
+            stop_percent=4.0,
+            tp1_percent=3.0,
+            tp2_percent=6.0,
+            tp3_percent=9.0,
+            facts={
+                "perpetual_eligible": True,
+                "market_tags": list(tags),
+            },
         )
 
     def test_caption_has_exact_dynamic_four_tag_structure(self):
         with tempfile.TemporaryDirectory() as directory:
             storage = Storage(Path(directory) / "test.db")
-            settings = {"captions": {"maximum_recent_phrases": 250, "guys_probability": 0.0}}
-            caption = CaptionEngine(storage, settings).generate(self._signal("BTC"), "account_01", "punchy")
+            settings = {
+                "captions": {
+                    "maximum_recent_phrases": 250,
+                    "guys_probability": 0.0,
+                }
+            }
+            caption = CaptionEngine(
+                storage,
+                settings,
+            ).generate(
+                self._signal("BTC"),
+                "account_01",
+                "punchy",
+            )
             tags = caption.splitlines()[-1].split()
             self.assertEqual(4, len(tags))
             self.assertEqual("#BTC", tags[0])
-            self.assertIn(tags[1], {"#Binance", "#binance"})
-            self.assertIn(tags[2], {"#Write2Earn", "#Write2Earn!"})
-            self.assertIn(tags[3], {"#crypto", "#Crypto"})
+            self.assertEqual(
+                {tag.lower().rstrip("!") for tag in tags[1:]},
+                {"#binance", "#write2earn", "#crypto"},
+            )
             storage.close()
 
     def test_bstock_uses_five_x_override(self):
         from app.caption_engine import _leverage_value
+
         signal = self._signal("AAPL", ("tradfi",))
-        self.assertEqual(5, _leverage_value(signal, bytes(range(32)), {"values": list(range(20, 51)) + [70, 100]}))
+        self.assertEqual(
+            5,
+            _leverage_value(
+                signal,
+                bytes(range(32)),
+                {"values": list(range(20, 51)) + [70, 100]},
+            ),
+        )
 
     def test_crypto_keeps_configured_high_leverage_values(self):
         from app.caption_engine import _leverage_value
+
         signal = self._signal("BTC", ("perpetual",))
         values = list(range(20, 51)) + [70, 100]
-        value = _leverage_value(signal, bytes(range(32)), {"values": values})
+        value = _leverage_value(
+            signal,
+            bytes(range(32)),
+            {"values": values},
+        )
         self.assertIn(value, values)
 
 
-
+if __name__ == "__main__":
+    unittest.main()

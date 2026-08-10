@@ -183,20 +183,36 @@ jobs:
 
           suffix = "${suffix}"
 
-          item = {
-              "account_id": f"account_{suffix}",
-              "square_secret_name": f"BINANCE_SQUARE_KEY_ACCOUNT_{suffix}",
-              "discord_secret_name": f"DISCORD_WEBHOOK_URL_ACCOUNT_{suffix}",
-              "facebook_page_id_secret_name": f"FACEBOOK_PAGE_ID_ACCOUNT_{suffix}",
-              "facebook_token_secret_name": f"FACEBOOK_PAGE_ACCESS_TOKEN_ACCOUNT_{suffix}",
-              "instagram_user_id_secret_name": f"INSTAGRAM_USER_ID_ACCOUNT_{suffix}",
-              "instagram_token_secret_name": f"INSTAGRAM_ACCESS_TOKEN_ACCOUNT_{suffix}",
-              "threads_user_id_secret_name": f"THREADS_USER_ID_ACCOUNT_{suffix}",
-              "threads_token_secret_name": f"THREADS_ACCESS_TOKEN_ACCOUNT_{suffix}",
-              "cloudinary_cloud_name_secret_name": f"CLOUDINARY_CLOUD_NAME_ACCOUNT_{suffix}",
-              "cloudinary_api_key_secret_name": f"CLOUDINARY_API_KEY_ACCOUNT_{suffix}",
-              "cloudinary_api_secret_secret_name": f"CLOUDINARY_API_SECRET_ACCOUNT_{suffix}"
-          }
+          if suffix == "02":
+              item = {
+                  "account_id": "account_02",
+                  "square_secret_name": "BINANCE_SQUARE_KEY_ACCOUNT_02",
+                  "discord_secret_name": "DISCORD_WEBHOOK_URL",
+                  "facebook_page_id_secret_name": "FACEBOOK_PAGE_ID",
+                  "facebook_token_secret_name": "FACEBOOK_PAGE_ACCESS_TOKEN",
+                  "instagram_user_id_secret_name": "INSTAGRAM_USER_ID",
+                  "instagram_token_secret_name": "INSTAGRAM_ACCESS_TOKEN",
+                  "threads_user_id_secret_name": "THREADS_USER_ID",
+                  "threads_token_secret_name": "THREADS_ACCESS_TOKEN",
+                  "cloudinary_cloud_name_secret_name": "CLOUDINARY_CLOUD_NAME",
+                  "cloudinary_api_key_secret_name": "CLOUDINARY_API_KEY",
+                  "cloudinary_api_secret_secret_name": "CLOUDINARY_API_SECRET"
+              }
+          else:
+              item = {
+                  "account_id": f"account_{suffix}",
+                  "square_secret_name": f"BINANCE_SQUARE_KEY_ACCOUNT_{suffix}",
+                  "discord_secret_name": f"DISCORD_WEBHOOK_URL_ACCOUNT_{suffix}",
+                  "facebook_page_id_secret_name": f"FACEBOOK_PAGE_ID_ACCOUNT_{suffix}",
+                  "facebook_token_secret_name": f"FACEBOOK_PAGE_ACCESS_TOKEN_ACCOUNT_{suffix}",
+                  "instagram_user_id_secret_name": f"INSTAGRAM_USER_ID_ACCOUNT_{suffix}",
+                  "instagram_token_secret_name": f"INSTAGRAM_ACCESS_TOKEN_ACCOUNT_{suffix}",
+                  "threads_user_id_secret_name": f"THREADS_USER_ID_ACCOUNT_{suffix}",
+                  "threads_token_secret_name": f"THREADS_ACCESS_TOKEN_ACCOUNT_{suffix}",
+                  "cloudinary_cloud_name_secret_name": f"CLOUDINARY_CLOUD_NAME_ACCOUNT_{suffix}",
+                  "cloudinary_api_key_secret_name": f"CLOUDINARY_API_KEY_ACCOUNT_{suffix}",
+                  "cloudinary_api_secret_secret_name": f"CLOUDINARY_API_SECRET_ACCOUNT_{suffix}"
+              }
 
           with open("matrix.json", "w", encoding="utf-8") as f:
               json.dump({"include": [item]}, f)

@@ -305,6 +305,8 @@ jobs:
 
       THREADS_PUBLISH_ENABLED: "true"
 
+      TELEGRAM_PUBLISH_ENABLED: "true"
+
       DISCORD_WEBHOOK_URL: ${{ secrets[matrix.discord_secret_name] }}
 
       FACEBOOK_PAGE_ID: ${{ secrets[matrix.facebook_page_id_secret_name] }}
@@ -318,6 +320,10 @@ jobs:
       THREADS_USER_ID: ${{ secrets[matrix.threads_user_id_secret_name] }}
 
       THREADS_ACCESS_TOKEN: ${{ secrets[matrix.threads_token_secret_name] }}
+
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
 
       CLOUDINARY_CLOUD_NAME: ${{ secrets[matrix.cloudinary_cloud_name_secret_name] }}
 

@@ -43,6 +43,7 @@ async function dispatchGitHubWorkflow(env) {
       ref,
       inputs: {
         trigger_source: "cloudflare",
+        account_id: "account_02",
         confirmation: "CLOUDFLARE_SLOT",
       },
     }),

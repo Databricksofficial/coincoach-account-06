@@ -85,8 +85,8 @@ jobs:
                 "facebook_token_secret_name": "FACEBOOK_PAGE_ACCESS_TOKEN_ACCOUNT_02",
                 "instagram_user_id_secret_name": "INSTAGRAM_USER_ID_ACCOUNT_02",
                 "instagram_token_secret_name": "INSTAGRAM_ACCESS_TOKEN_ACCOUNT_02",
-                "threads_user_id_secret_name": "THREADS_USER_ID_ACCOUNT_02",
-                "threads_token_secret_name": "THREADS_ACCESS_TOKEN_ACCOUNT_02",
+                "threads_user_id_secret_name": "THREADS_USER_ID",
+                "threads_token_secret_name": "THREADS_ACCESS_TOKEN",
                 "cloudinary_cloud_name_secret_name": "CLOUDINARY_CLOUD_NAME_ACCOUNT_02",
                 "cloudinary_api_key_secret_name": "CLOUDINARY_API_KEY_ACCOUNT_02",
                 "cloudinary_api_secret_secret_name": "CLOUDINARY_API_SECRET_ACCOUNT_02"
@@ -192,8 +192,8 @@ jobs:
                 "facebook_token_secret_name": "FACEBOOK_PAGE_ACCESS_TOKEN_ACCOUNT_02",
                 "instagram_user_id_secret_name": "INSTAGRAM_USER_ID_ACCOUNT_02",
                 "instagram_token_secret_name": "INSTAGRAM_ACCESS_TOKEN_ACCOUNT_02",
-                "threads_user_id_secret_name": "THREADS_USER_ID_ACCOUNT_02",
-                "threads_token_secret_name": "THREADS_ACCESS_TOKEN_ACCOUNT_02",
+                "threads_user_id_secret_name": "THREADS_USER_ID",
+                "threads_token_secret_name": "THREADS_ACCESS_TOKEN",
                 "cloudinary_cloud_name_secret_name": "CLOUDINARY_CLOUD_NAME_ACCOUNT_02",
                 "cloudinary_api_key_secret_name": "CLOUDINARY_API_KEY_ACCOUNT_02",
                 "cloudinary_api_secret_secret_name": "CLOUDINARY_API_SECRET_ACCOUNT_02"

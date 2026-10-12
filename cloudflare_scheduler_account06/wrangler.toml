@@ -1,0 +1,15 @@
+name = "coincoach-square-scheduler-account06"
+main = "src/index.js"
+compatibility_date = "2026-07-30"
+
+[triggers]
+# Account 02 baseline: 6,21,36,51, with 0–120 seconds jitter.
+# Account 06 nominal slots are shifted by +7 minutes.
+crons = ["13,28,43,58 * * * *"]
+
+[vars]
+GITHUB_OWNER = "Databricksofficial"
+GITHUB_REPO = "coincoach-account-06"
+GITHUB_WORKFLOW = "live-square-96-per-day.yml"
+GITHUB_REF = "main"
+JITTER_MAX_SECONDS = "120"
